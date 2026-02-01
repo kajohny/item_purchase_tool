@@ -1,0 +1,21 @@
+<template>
+    <lightning-card>
+        <div class="header">
+            <div class="left">
+                <lightning-button label="Create Item" class="left-button"></lightning-button>
+            </div>
+
+            <template if:true={account}>
+                <div class="account-info">
+                    <span class="truncate">{account.Name}</span>
+                    <span class="truncate">{account.AccountNumber}</span>
+                    <span class="truncate">{account.Industry}</span>
+                </div>
+            </template>
+
+            <div class="right">
+                <lightning-button label="Cart" class="right-button"></lightning-button>
+            </div>
+        </div>
+    </lightning-card>
+</template>
