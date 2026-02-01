@@ -1,0 +1,26 @@
+<template>
+    <div class="tile slds-box slds-theme_default">
+        <div class="title slds-text-heading_small slds-truncate" title={item.Name}>
+            {item.Name}
+        </div>
+
+        <div class="body slds-m-top_small">
+            <template if:true={item.Image__c}>
+                <img class="img" src={item.Image__c} alt={item.Name} />
+            </template>
+
+            <div class="desc slds-m-top_small slds-text-body_small">
+                {item.Description__c}
+            </div>
+
+            <div class="price slds-m-top_small slds-text-title_bold">
+                Price: {item.Price__c}
+            </div>
+        </div>
+
+        <div class="actions slds-m-top_medium">
+            <lightning-button label="Details" variant="neutral" onclick={handleDetails}></lightning-button>
+            <lightning-button label="Add" variant="brand" onclick={handleAdd}></lightning-button>
+        </div>
+    </div>
+</template>

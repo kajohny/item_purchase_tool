@@ -1,7 +1,7 @@
 public with sharing class ItemController {
     @AuraEnabled(cacheable=true)
     public static List<Item__c> getItems(String family, String type, String searchTerm) {
-        String baseQuery = 'SELECT Id, Name, Description__c, Type__c, Family__c, Image__c, Price_c FROM Item__c';
+        String baseQuery = 'SELECT Id, Name, Description__c, Type__c, Family__c, Image__c, Price__c FROM Item__c';
 
         List<String> conditions = new List<String>();
 

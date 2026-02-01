@@ -32,3 +32,16 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.content {
+    padding-top: 8px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.cell {
+    min-width: 0;
+}
