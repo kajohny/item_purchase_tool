@@ -3,8 +3,10 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getItems from '@salesforce/apex/ItemController.getItems';
 import getItemsCount from '@salesforce/apex/ItemController.getItemsCount';
 import getAccount from '@salesforce/apex/GetAccountInfo.getAccount';
+import checkout from '@salesforce/apex/PurchaseService.checkout';
+import { NavigationMixin } from 'lightning/navigation';
 
-export default class ItemPurchaseTool extends LightningElement {
+export default class ItemPurchaseTool extends NavigationMixin(LightningElement) {
     @api recordId;
     account;
 
@@ -117,13 +119,36 @@ export default class ItemPurchaseTool extends LightningElement {
         this.isCartOpen = false;
     }
 
-    handleCheckout() {
-        this.dispatchEvent(
-            new ShowToastEvent({
-            title: 'Checkout',
-            message: 'sss',
-            variant: 'sss'
-            })
-        );
+    async handleCheckout() {
+        try {
+            const itemIds = this.cartItems.map(i => i.Id);
+
+            const purchaseId = await checkout({accountId: this.recordId, itemIds: itemIds});
+
+            this.closeCart();
+            this.cartItems = [];
+
+            console.log('purchaseId', purchaseId);
+
+            const url = await this[NavigationMixin.GenerateUrl]({
+                type: 'standard__recordPage',
+                attributes: {
+                    recordId: purchaseId,
+                    objectApiName: 'Purchase__c',
+                    actionName: 'view'
+                }
+            });
+
+            window.location.assign(url);
+        } catch (e) {
+            console.error(e);
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Checkout failed',
+                    message: e?.body?.message || 'Unexpected error',
+                    variant: error 
+                })
+            );
+        }
     }
 }
