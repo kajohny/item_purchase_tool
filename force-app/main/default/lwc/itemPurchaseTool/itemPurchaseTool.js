@@ -5,10 +5,14 @@ import getItemsCount from '@salesforce/apex/ItemController.getItemsCount';
 import getAccount from '@salesforce/apex/GetAccountInfo.getAccount';
 import checkout from '@salesforce/apex/PurchaseService.checkout';
 import { NavigationMixin } from 'lightning/navigation';
+import isCurrentUserManager from '@salesforce/apex/UserService.isCurrentUserManager';
+import fillItemImage from '@salesforce/apex/ItemImageController.fillItemImage';
+import { refreshApex } from '@salesforce/apex';
 
 export default class ItemPurchaseTool extends NavigationMixin(LightningElement) {
     @api recordId;
     account;
+    isManager=false;
 
     searchTerm = '';
     selectedType = '';
@@ -38,18 +42,27 @@ export default class ItemPurchaseTool extends NavigationMixin(LightningElement) 
         }
     }
 
+    @wire(isCurrentUserManager)
+    wiredIsManager({ data, error }) {
+        if (data !== undefined ) {
+            this.isManager = data;
+        } else if (error) {
+            console.error(error);
+        }
+    }
+
+    wiredItemsResult;
     @wire(getItems, {
         family: '$selectedFamily',
         type: '$selectedType',
         searchTerm: '$searchTerm'
     })
 
-    wiredItems({ data, error }) {
-        if (data) {
-            this.items = data;
-        } else if (error) {
-            console.error(error);
-        }
+    wiredItems(result) {
+        this.wiredItemsResult = result;
+        const { data, error } = result;
+        if (data) this.items = data;
+        if (error) console.error(error);
     }
 
     @wire(getItemsCount, {
@@ -149,6 +162,42 @@ export default class ItemPurchaseTool extends NavigationMixin(LightningElement) 
                     variant: error 
                 })
             );
+        }
+    }
+    
+    isCreateItemOpen = false;
+    openCreateItemModal() {
+        this.isCreateItemOpen = true;
+    }
+
+    closeCreateItemModal() {
+        this.isCreateItemOpen = false;
+    }
+
+    async handleItemCreated(event) {
+        const itemId = event.detail.id;
+
+        try {
+            await fillItemImage({ itemId });
+        } catch (e) {
+            console.error('fillItemImage error', e);
+
+            const msg = e?.body?.message || (Array.isArray(e?.body) ? e.body.map(x => x.message).join(', ') : null) || e?.message || 'Unknown error';
+
+
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Item created, but image not loaded',
+                    message: msg,
+                    variant: 'warning'
+                })
+            );
+        }
+
+        this.closeCreateItemModal();
+
+        if (this.wiredItemResult) {
+            await refreshApex(this.wiredItemResult);
         }
     }
 }

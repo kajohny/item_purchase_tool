@@ -2,7 +2,9 @@
     <lightning-card>
         <div class="header">
             <div class="left">
-                <lightning-button label="Create Item" class="left-button"></lightning-button>
+                <template if:true={isManager}>
+                    <lightning-button label="Create Item" onclick={openCreateItemModal} class="left-button"></lightning-button>
+                </template>
             </div>
 
             <template if:true={account}>
@@ -124,4 +126,35 @@
 
             <div class="slds-backdrop slds-backdrop_open"></div>
         </template> 
+
+        <template if:true={isCreateItemOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close" onclick={closeCreateItemModal}>
+                            <lightning-icon icon-name="utility:close" size="small"></lightning-icon>
+                        </button>
+                        <h2 class="slds-text-heading_medium">Create Item</h2>
+                    </header>
+
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <lightning-record-edit-form object-api-name="Item__c" onsuccess={handleItemCreated}>
+                            <lightning-messages></lightning-messages>
+                            <lightning-input-field field-name="Name"></lightning-input-field>
+                            <lightning-input-field field-name="Description__c"></lightning-input-field>
+                            <lightning-input-field field-name="Type__c"></lightning-input-field>
+                            <lightning-input-field field-name="Family__c"></lightning-input-field>
+                            <lightning-input-field field-name="Price__c"></lightning-input-field>
+
+                            <div class="slds-m-top_medium">
+                                <lightning-button type="submit" label="Save" variant="brand"></lightning-button>
+                                <lightning-button label="Cancel" onclick={closeCreateItemModal} class="slds-m-left_small"></lightning-button>
+                            </div>
+                        </lightning-record-edit-form>
+                    </div>
+                </div>
+            </section>
+
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
 </template>
