@@ -14,13 +14,15 @@ public with sharing class ItemController {
         }
         
         if (String.isNotBlank(searchTerm)) {
-            String likeTerm = '%' + searchTerm + '%';
-            conditions.add('Name LIKE :likeTerm OR Description__c LIKE :likeTerm');
+            String likeTerm = '%' + searchTerm.trim() + '%';
+            conditions.add('(Name LIKE :likeTerm OR Description__c LIKE :likeTerm)');
         }
         
         if (!conditions.isEmpty()) {
             baseQuery += ' WHERE ' + String.join(conditions, ' AND ');
         }
+
+        baseQuery += ' ORDER BY Name';
 
         return Database.query(baseQuery);
     }
@@ -40,13 +42,15 @@ public with sharing class ItemController {
         }
         
         if (String.isNotBlank(searchTerm)) {
-            String likeTerm = '%' + searchTerm + '%';
-            conditions.add('Name LIKE :likeTerm OR Description__c LIKE :likeTerm');
+            String likeTerm = '%' + searchTerm.trim() + '%';
+            conditions.add('(Name LIKE :likeTerm OR Description__c LIKE :likeTerm)');
         }
 
         if (!conditions.isEmpty()) {
             baseQuery += ' WHERE ' + String.join(conditions, ' AND ');
         }
+
+        baseQuery += ' ORDER BY Name';
 
         return Database.countQuery(baseQuery);
     }
