@@ -8,6 +8,10 @@ import { NavigationMixin } from 'lightning/navigation';
 import isCurrentUserManager from '@salesforce/apex/UserService.isCurrentUserManager';
 import fillItemImage from '@salesforce/apex/ItemImageController.fillItemImage';
 import { refreshApex } from '@salesforce/apex';
+import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
+import ITEM_OBJECT from '@salesforce/schema/Item__c';
+import TYPE_FIELD from '@salesforce/schema/Item__c.Type__c';
+import FAMILY_FIELD from '@salesforce/schema/Item__c.Family__c';
 
 export default class ItemPurchaseTool extends NavigationMixin(LightningElement) {
     @api recordId;
@@ -18,6 +22,7 @@ export default class ItemPurchaseTool extends NavigationMixin(LightningElement) 
     selectedType = '';
     selectedFamily = '';
 
+    itemRecordTypeId;
     items = [];
     cartItems = [];
     itemsCount = 0;
@@ -76,6 +81,47 @@ export default class ItemPurchaseTool extends NavigationMixin(LightningElement) 
             this.itemsCount = data;
         } else if (error) {
             console.error(error);
+        }
+    }
+    
+    @wire(getObjectInfo, { objectApiName: ITEM_OBJECT })
+    itemObjectInfo({ data, error }) {
+        if (data) {
+            this.itemRecordTypeId = data.defaultRecordTypeId;
+        } else if (error) {
+            console.error(error);
+        }
+    }
+
+    typeOptions = [];
+    @wire(getPicklistValues, { recordTypeId: '$itemRecordTypeId', fieldApiName: TYPE_FIELD })
+    wiredTypePicklist({ data, error }) {
+        if (data) {
+            this.typeOptions = [
+                { label: 'All', value: '' },
+                ...data.values.map(v => ({
+                    label: v.label,
+                    value: v.value
+                }))
+            ];
+        } else if (error) {
+            console.error(error);   
+        }
+    }
+
+    familyOptions = [];
+    @wire(getPicklistValues, { recordTypeId: '$itemRecordTypeId', fieldApiName: FAMILY_FIELD })
+    wiredFamilyPicklist({ data, error }) {
+        if (data) {
+            this.familyOptions = [
+                { label: 'All', value: '' },
+                ...data.values.map(v => ({
+                    label: v.label,
+                    value: v.value
+                }))
+            ];
+        } else if (error) {
+            console.error(error);   
         }
     }
 
