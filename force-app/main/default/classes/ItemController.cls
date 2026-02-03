@@ -22,8 +22,6 @@ public with sharing class ItemController {
             baseQuery += ' WHERE ' + String.join(conditions, ' AND ');
         }
 
-        baseQuery += ' ORDER BY Name';
-
         return Database.query(baseQuery);
     }
 
@@ -49,8 +47,6 @@ public with sharing class ItemController {
         if (!conditions.isEmpty()) {
             baseQuery += ' WHERE ' + String.join(conditions, ' AND ');
         }
-
-        baseQuery += ' ORDER BY Name';
 
         return Database.countQuery(baseQuery);
     }

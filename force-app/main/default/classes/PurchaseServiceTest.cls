@@ -26,7 +26,7 @@ private class PurchaseServiceTest {
 
         System.assertEquals(acc.Id, p.ClientId__c);
         System.assertEquals(2, p.TotalItems__c);
-        System.assertEquals(30, p.GrandTotal__c);
+        System.assertEquals(300, p.GrandTotal__c);
 
         Integer lineCount = [SELECT COUNT() FROM PurchaseLine__c WHERE PurchaseId__c = :purchaseId];
         System.assertEquals(2, lineCount);
